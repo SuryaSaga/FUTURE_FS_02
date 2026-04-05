@@ -60,12 +60,9 @@ const Dashboard = () => {
     if (!newNote.trim()) return;
     try {
       setNewNote('');
-      await api.put(`/leads/${id}`, { note: newNote });
+      const { data } = await api.put(`/leads/${id}`, { note: newNote });
       fetchLeads();
-      const updated = leads.find(l => l._id === id);
-      if (updated) {
-        setSelectedLead({ ...updated, notes: [...updated.notes, { text: newNote, timestamp: new Date() }] });
-      }
+      setSelectedLead(data);
     } catch (err) {
       console.error(err);
     }
@@ -73,12 +70,9 @@ const Dashboard = () => {
 
   const updateAssignment = async (id, assignedTo) => {
     try {
-      await api.put(`/leads/${id}/assign`, { assignedTo });
+      const { data } = await api.put(`/leads/${id}/assign`, { assignedTo });
       fetchLeads();
-      const updated = leads.find(l => l._id === id);
-      if (updated) {
-        setSelectedLead({ ...updated, assignedTo });
-      }
+      setSelectedLead(data);
     } catch (err) {
       console.error(err);
     }

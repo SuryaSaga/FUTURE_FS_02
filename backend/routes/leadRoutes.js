@@ -59,46 +59,58 @@ router.get('/stats', protect, async (req, res) => {
 // @route   GET /api/leads
 // @access  Private
 router.get('/', protect, async (req, res) => {
-    const leads = await Lead.find({}).sort({ createdAt: -1 });
-    res.json(leads);
+    try {
+        const leads = await Lead.find({}).sort({ createdAt: -1 });
+        res.json(leads);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
 });
 
 // @desc    Create a lead (Website form submission)
 // @route   POST /api/leads
 // @access  Public
 router.post('/', async (req, res) => {
-    const { name, email, source } = req.body;
+    try {
+        const { name, email, source } = req.body;
 
-    if (!name || !email) {
-        return res.status(400).json({ message: 'Please provide name and email' });
+        if (!name || !email) {
+            return res.status(400).json({ message: 'Please provide name and email' });
+        }
+
+        const lead = await Lead.create({
+            name,
+            email,
+            source: source || 'Website'
+        });
+
+        res.status(201).json(lead);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
-
-    const lead = await Lead.create({
-        name,
-        email,
-        source: source || 'Website'
-    });
-
-    res.status(201).json(lead);
 });
 
 // @desc    Update lead status or add notes
 // @route   PUT /api/leads/:id
 // @access  Private
 router.put('/:id', protect, async (req, res) => {
-    const { status, note } = req.body;
-    const lead = await Lead.findById(req.params.id);
+    try {
+        const { status, note } = req.body;
+        const lead = await Lead.findById(req.params.id);
 
-    if (lead) {
-        if (status) lead.status = status;
-        if (note) {
-            lead.notes.push({ text: note });
+        if (lead) {
+            if (status) lead.status = status;
+            if (note) {
+                lead.notes.push({ text: note });
+            }
+
+            const updatedLead = await lead.save();
+            res.json(updatedLead);
+        } else {
+            res.status(404).json({ message: 'Lead not found' });
         }
-
-        const updatedLead = await lead.save();
-        res.json(updatedLead);
-    } else {
-        res.status(404).json({ message: 'Lead not found' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
 });
 
@@ -106,13 +118,17 @@ router.put('/:id', protect, async (req, res) => {
 // @route   DELETE /api/leads/:id
 // @access  Private
 router.delete('/:id', protect, async (req, res) => {
-    const lead = await Lead.findById(req.params.id);
+    try {
+        const lead = await Lead.findById(req.params.id);
 
-    if (lead) {
-        await lead.deleteOne();
-        res.json({ message: 'Lead removed' });
-    } else {
-        res.status(404).json({ message: 'Lead not found' });
+        if (lead) {
+            await lead.deleteOne();
+            res.json({ message: 'Lead removed' });
+        } else {
+            res.status(404).json({ message: 'Lead not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
 });
 
@@ -120,15 +136,19 @@ router.delete('/:id', protect, async (req, res) => {
 // @route   PUT /api/leads/:id/assign
 // @access  Private
 router.put('/:id/assign', protect, async (req, res) => {
-    const { assignedTo } = req.body;
-    const lead = await Lead.findById(req.params.id);
+    try {
+        const { assignedTo } = req.body;
+        const lead = await Lead.findById(req.params.id);
 
-    if (lead) {
-        lead.assignedTo = assignedTo;
-        const updatedLead = await lead.save();
-        res.json(updatedLead);
-    } else {
-        res.status(404).json({ message: 'Lead not found' });
+        if (lead) {
+            lead.assignedTo = assignedTo;
+            const updatedLead = await lead.save();
+            res.json(updatedLead);
+        } else {
+            res.status(404).json({ message: 'Lead not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
 });
 
