@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run backend-dev\" \"npm run frontend-dev\"",
-    "start": "cd backend && node server.js",
+    "start": "node server.js",
     "build": "npm install && cd backend && npm install && cd ../frontend && npm install && npm run build",
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install && npm run build",
     "backend-dev": "cd backend && npm start",
     "frontend-dev": "cd frontend && npm run dev",
     "seed": "cd backend && npm run seed"
