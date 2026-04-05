@@ -6,7 +6,8 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const leadRoutes = require('./routes/leadRoutes');
 
-dotenv.config();
+// Load .env from backend directory (works whether cwd is root or backend/)
+dotenv.config({ path: path.join(__dirname, '.env') });
 connectDB();
 
 const app = express();
