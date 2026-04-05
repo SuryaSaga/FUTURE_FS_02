@@ -38,8 +38,8 @@ const Dashboard = () => {
       const { data } = await api.get('/leads/stats');
       setStats({
         total: data.total || 0,
-        new: data.status.new || 0,
-        converted: data.status.converted || 0
+        new: data.status?.new || 0,
+        converted: data.status?.converted || 0
       });
     } catch (err) {
       console.error('Stats fetch failed:', err);
@@ -95,6 +95,10 @@ const Dashboard = () => {
     try {
       await api.delete(`/leads/${id}`);
       setDeleteConfirmId(null);
+      // Close detail modal if the deleted lead was open
+      if (selectedLead && selectedLead._id === id) {
+        setSelectedLead(null);
+      }
       fetchLeads();
       fetchStats();
     } catch (err) {
@@ -202,7 +206,14 @@ const Dashboard = () => {
             </div>
 
             {loading ? (
-              <p>Loading leads...</p>
+              <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>Loading leads...</p>
+            ) : filteredLeads.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                <p style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>No leads found</p>
+                <p style={{ fontSize: '0.875rem' }}>
+                  {searchTerm ? 'Try a different search term.' : 'Click "+ Add Lead" to get started.'}
+                </p>
+              </div>
             ) : (
               <div className="leads-grid" id="leads-section">
                 {filteredLeads.map((lead, idx) => (
@@ -233,8 +244,8 @@ const Dashboard = () => {
                       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         {deleteConfirmId === lead._id ? (
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button onClick={(e) => { e.stopPropagation(); deleteLead(lead._id); }} style={{ color: '#ef4444', fontSize: '0.75rem', background: 'transparent', border: 'none' }}>Confirm</button>
-                            <button onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(null); }} style={{ color: 'var(--text-muted)', fontSize: '0.75rem', background: 'transparent', border: 'none' }}>Cancel</button>
+                            <button onClick={(e) => { e.stopPropagation(); deleteLead(lead._id); }} style={{ color: '#ef4444', fontSize: '0.75rem', background: 'transparent', border: 'none', cursor: 'pointer' }}>Confirm</button>
+                            <button onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(null); }} style={{ color: 'var(--text-muted)', fontSize: '0.75rem', background: 'transparent', border: 'none', cursor: 'pointer' }}>Cancel</button>
                           </div>
                         ) : (
                           <button 

@@ -42,8 +42,11 @@ body {
   border-radius: 24px;
   padding: 2.5rem;
   width: 100%;
-  max-width: 400px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.auth-card {
+  max-width: 400px;
 }
 
 .input-group {

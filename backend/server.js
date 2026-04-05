@@ -21,7 +21,8 @@ app.use('/api/leads', leadRoutes);
 if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
     app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-    app.get('*', (req, res) => {
+    // Only serve index.html for non-API routes
+    app.get(/^(?!\/api).*/, (req, res) => {
         res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
     });
 } else {
@@ -30,16 +31,16 @@ if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
     });
 }
 
+// Global error handler (must be before app.listen)
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Internal Server Error' });
+});
+
 // Start server on all environments EXCEPT Vercel Serverless
 if (!process.env.VERCEL) {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
-
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Internal Server Error' });
-});
 
 module.exports = app;

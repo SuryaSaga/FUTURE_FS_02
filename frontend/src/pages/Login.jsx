@@ -28,7 +28,7 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <div className="glass-card animate-fade-in">
+      <div className="glass-card auth-card animate-fade-in">
         <h2 style={{ marginBottom: '0.5rem', textAlign: 'center' }}>Admin Login</h2>
         <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginBottom: '2rem' }}>
           Welcome back to Future CRM
