@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
@@ -16,11 +17,21 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
 
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
+// Serve Frontend
+if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('API is running...');
+    });
+}
+
+// Start server on all environments EXCEPT Vercel Serverless
+if (!process.env.VERCEL) {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
